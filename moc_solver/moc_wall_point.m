@@ -6,7 +6,7 @@ global a0;
 global gamma;
 %% Setup initial itteration
 tol      = 1e-4; % Tollerance to stop itterating after
-max_runs = 500;  % If it takes this long, something's wrong
+max_runs = 50;  % If it takes this long, something's wrong
 begin_checking_out_of_bounds = 5; % don't start immediatly
 
 % extract data from data_1 and data_2
@@ -23,15 +23,14 @@ x_next = x_prev * 0;
 % initial conditions
 x3 = x_1;
 y3 = f_wall( x3 );
+alpha = f_wall_der( x3 );
 
 u_13 = u_1;
 v_13 = v_1;
 
 y_13 = y_1;
 
-lambda_1_1 = ( u_1 * v_1 + a_1 * sqrt( u_1^2 + v_1^2 - a_1^2 ) ) ...
-          / ( u_1^2 - a_1^2 );
-
+lambda_1_1 = lambda( u_1, v_1, a_1, +1 );
 lambda_13 = lambda_1_1;
 
 %% Main loop
@@ -42,13 +41,12 @@ while( not_conv )
     %% Setup variables that rely on initial conditions
     a_13 = sqrt( a0^2 - (gamma-1)/2 * (u_13^2 + v_13^2) );
 
-    Q_13 = u_13^2 - a_13;
+    Q_13 = u_13^2 - a_13^2;
 
     R_13 = 2 * u_13 * v_13 - Q_13 * lambda_13;
 
     S_13 = (a_13^2 * v_13) / y_13;
     
-    alpha = f_wall_der( x3 );
 
     %% Solve for the next itteration 
     A = [...
@@ -80,8 +78,7 @@ while( not_conv )
     y_13 = ( y_1 + y3 ) / 2;
     
     
-    lambda_1_3 = (u3*v3 + a3 * sqrt(u3^2 + v3^2 - a3^2) ) / (u3^2-a3^2);
-
+    lambda_1_3 = lambda( u3, v3, a3, +1, u_13, a_13 );
     lambda_13 = ( lambda_1_1 + lambda_1_3 ) / 2;
       
       
@@ -95,7 +92,8 @@ while( not_conv )
     % Check for infinite loop
     counter = counter + 1;
     if( counter > max_runs )
-        error( 'ERROR:MOC:FAILED_TO_CONVERGE', 'counter exceeded max_runs' );
+        error( 'ERROR:MOC:FAILED_TO_CONVERGE',...
+            'counter exceeded max_runs in moc_wall, C' );
     end
     
     % Check for fail to converge / converging outside bounds

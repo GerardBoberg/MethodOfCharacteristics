@@ -4,10 +4,11 @@ function [ x, y, u, v, a, M ] = moc_iterative_solver( ...
 %   Detailed explanation goes here
 
 N_POLY = 4;
+fps = 10000;
 
 %% Setup variables
 % Setup matricies
-dimensions = [ n, 10 * n ];
+dimensions = [ n, 3 * n ];
 
 x = zeros( dimensions );
 y = zeros( dimensions );
@@ -41,6 +42,11 @@ y_star = y_nozzle(end);
 % i1 [ 1  2  2  3  3 ]
 %     j1 j2 j3 j4 j5
 
+figure();
+hold on
+plot(x_nozzle,y_nozzle,'LineWidth',4,'Color','k')
+
+try
 not_done  = true;
 % n = number of given initial characteristic lines
 char_line = 0; 
@@ -72,7 +78,7 @@ while( not_done )    % For each characteristic line, we don't know how many
                 moc_wall_point( data_1, f_wall, f_wall_der, x_star );
         catch e
             if( strcmp( e.identifier, 'ERROR:MOC:MISSED_WALL' ) )
-                break;
+                display( 'Missed wall, erroring out' );
                 % Cast D
                 [ x(ii,jj), y(ii,jj), u(ii,jj), v(ii,jj), a(ii,jj) ] = ...
                     moc_wall_backsolve( ...
@@ -85,6 +91,7 @@ while( not_done )    % For each characteristic line, we don't know how many
                 throw( e );
             end
         end
+        plot( real(x(ii,jj)), real(y(ii,jj)), 'rx' );
     end % END SETUP INDEX
     
     %% CAST THE LINE DOWN TO THE SYMMETRY PLANE
@@ -101,7 +108,7 @@ while( not_done )    % For each characteristic line, we don't know how many
     final_value = length( i_values );
     
     for index = 2:final_value % for every point on the line until symmetry
-        
+        pause( 1/ fps );
         % setup indexing
         ic = i_values( index ); % ic, jc are the current index
         jc = j_values( index );
@@ -119,6 +126,7 @@ while( not_done )    % For each characteristic line, we don't know how many
             % Cast B
             [ x(ic,jc), y(ic,jc), u(ic,jc), v(ic,jc), a(ic,jc) ] = ...
                 moc_symmetry_point( data_2 );
+            plot( [x(ii,jj),real(x(ic,jc))], [y(ii,jj), real(y(ic,jc))], 'r' );
             
         else % every other interrior point
             data_1 = [ x(i1, j1), y(i1,j1), u(i1,j1), v(i1,j1), a(i1,j1) ];
@@ -126,11 +134,15 @@ while( not_done )    % For each characteristic line, we don't know how many
             % Cast A
             [ x(ic,jc), y(ic,jc), u(ic,jc), v(ic,jc), a(ic,jc) ] = ...
                 moc_interior_point( data_1, data_2 );
+            
         end
+        
     end
     
 end
-
+catch e
+    display( e.message )
+end
 
 % cleanup at the end
 M = (u.^2 + v.^2) ./ a.^2;

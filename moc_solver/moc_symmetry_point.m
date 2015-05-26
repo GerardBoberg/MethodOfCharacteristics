@@ -4,7 +4,7 @@ function [ x3, y3, u3, v3, a3 ] = moc_symmetry_point( data_2 )
 global a0;
 global gamma;
 %% Setup initial itteration
-tol      = 1e-4; % Tollerance to stop itterating after
+tol      = 1e-4; % Tolerance to stop itterating after
 max_runs = 500;  % If it takes this long, something's wrong
 
 % extract data from data_2
@@ -25,9 +25,8 @@ v_23 = v_2;
 
 y_23 = y_2;
 
-lambda_2_2 = ( u_2 * v_2 - a_2 * sqrt( u_2^2 + v_2^2 - a_2^2 ) ) ...
-          / ( u_2^2 - a_2^2 );
-
+a_23 = sqrt( a0^2 - (gamma-1)/2 * (u_23^2 + v_23^2) );
+lambda_2_2 = lambda( u_2, v_2, a_2, -1, u_23, a_23 );
 lambda_23 = lambda_2_2;
 
 
@@ -40,7 +39,7 @@ while( not_conv )
     %% Setup variables that rely on initial conditions
     a_23 = sqrt( a0^2 - (gamma-1)/2 * (u_23^2 + v_23^2) );
 
-    Q_23 = u_23^2 - a_23;
+    Q_23 = u_23^2 - a_23^2;
 
     R_23 = 2 * u_23 * v_23 - Q_23 * lambda_23;
 
@@ -75,8 +74,7 @@ while( not_conv )
     y_23 = ( y_2 + y3 ) / 2;
     
     
-    lambda_2_3 = (u3*v3 - a3 * sqrt(u3^2 + v3^2 - a3^2) ) / (u3^2-a3^2);
-
+    lambda_2_3 = lambda( u3, v3, a3, -1 );
     lambda_23 = ( lambda_2_2 + lambda_2_3 ) / 2;
       
       
@@ -90,7 +88,8 @@ while( not_conv )
     % Check for infinite loop
     counter = counter + 1;
     if( counter > max_runs )
-        error( 'ERROR:MOC:FAILED_TO_CONVERGE', 'counter exceeded max_runs' );
+        error( 'ERROR:MOC:FAILED_TO_CONVERGE',...
+            'counter exceeded max_runs in moc_symmetry, B' );
     end
 end % End loop
 

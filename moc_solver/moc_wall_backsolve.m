@@ -38,17 +38,15 @@ u_12 = (u_1 + u_2) / 2;
 v_12 = (v_1 + v_2) / 2;
 
 y_12 = (y_1 + y_2) / 2;
+a_12 = sqrt( a0^2 - (gamma-1)/2 * ( u_12^2 + v_12^2 ) );
 
-lambda_2_1 = ( u_1 * v_1 - a_1 * sqrt( u_1^2 + v_1^2 - a_1^2 ) ) ...
-          / ( u_1^2 - a_1^2 );
-lambda_2_2 = ( u_2 * v_2 - a_2 * sqrt( u_2^2 + v_2^2 - a_2^2 ) ) ...
-          / ( u_2^2 - a_2^2 );
+lambda_2_1 = lambda( u_1, v_1, a_1, -1, u_12, a_12 );
+lambda_2_2 = lambda( u_2, v_2, a_2, -1, u_12, a_12 );
 
 lambda_12 = ( lambda_2_1 + lambda_2_2 ) / 2;
 
-a_12 = sqrt( a0^2 - (gamma-1)/2 * ( u_12^2 + v_12^2 ) );
 S_12 = ( a_12^2 * v_12 ) / y_12;
-Q_12 = u_12^2 - a_12;
+Q_12 = u_12^2 - a_12^2;
 R_12 = 2 * u_12 * v_12 - Q_12 * lambda_12;
 
 
@@ -66,19 +64,16 @@ while( not_conv )
     a3 = sqrt( a0^2 - (gamma-1)/2 * ( u3^2 + v3^2 ) );
     a_a3 = sqrt( a0^2 - (gamma-1)/2 * (u_a3^2 + v_a3^2) );
     
-    lambda_1_a = ( u_a * v_a + a_a * sqrt( u_a^2 + v_a^2 - a_a^2 ) ) ...
-          / ( u_a^2 - a_a^2 );
-      
-    lambda_1_3 = (u3*v3 + a3 * sqrt(u3^2 + v3^2 - a3^2) ) / (u3^2-a3^2);
-
+    lambda_1_a = lambda( u_a, v_a, a_a, +1, u_a3, a_a3 );
+    lambda_1_3 = lambda( u3, v3, a3, +1, u_a3, a_a3 );
     lambda_a3 = ( lambda_1_a + lambda_1_3 ) / 2;
 
 
     S_a3 = ( a_a3^2 * v_a3 ) / y_a3;
-    Q_a3 = u_a3^2 - a_a3;
+    Q_a3 = u_a3^2 - a_a3^2;
     R_a3 = 2 * u_a3 * v_a3 - Q_a3 * lambda_a3;
     
-    theta = atan( f_wall_der( x3 ) );
+    theta = atan( v3/u3 );
     
 
     %% Solve for the next itteration 
@@ -87,7 +82,7 @@ while( not_conv )
             lambda_a3, -1,     0,           0,     0,     0;...
                 -S_12,  0,  Q_12,        R_12,     0,     0;...
                 -S_a3,  0,  Q_a3,        R_a3, -Q_a3, -R_a3;...
-            v_2 - v_1,  0,     0, -(x3 - x_1),     0,     0;...
+            v_2 - v_1,  0,     0, -(x_2 - x_1),     0,     0;...
                     0,  0,     0,   0,  sin( theta ), -cos( theta ) ...
         ];
 

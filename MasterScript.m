@@ -20,7 +20,7 @@ addpath( 'moc_solver' )
 %% Setup Global variables.
 % CHANGE THINGS HERE for different gasses.
 
-n = 50; % number of characteristic lines
+n = 34; % number of characteristic lines
 
 
 R     = 287;  % J / kg K
@@ -46,21 +46,34 @@ thermo.T0    = T0;
 [ x, y, u, v, a, M ] = moc_iterative_solver( x_nozzle, y_nozzle, n,...
                                                thermo, y_throat );
 
-x = ( x(:,1:9) )
 x = real( x );
-y = real( y(:,1:9) );
-M = real( M(:,1:9) );
+y = real( y );
+M = real( M );
 % solve out the thermodynamic properties based on Mach
 [ P_nozzlethroat, P_static_wall ] = thermo_relation(...
                                    gamma, M, M(end,:), T0, P0, R );
 
+
+                               
+%% Plot the results
 figure
-surf(x,y,M)
+surfc(x,y,M, 'EdgeAlpha', 0.1)
 %contour( x, y, M )
 view(2)
 colorbar; 
 hold on
 plot(x_nozzle,y_nozzle,'LineWidth',4,'Color','k')
 title( 'Mach number variation' )
+xlabel('meters')
+ylabel('meters')
+
+figure
+surfc(x,y,P_nozzlethroat, 'EdgeAlpha', 0.1)
+%contour( x, y, M )
+view(2)
+colorbar; 
+hold on
+plot(x_nozzle,y_nozzle,'LineWidth',4,'Color','k')
+title( 'Pressure variation' )
 xlabel('meters')
 ylabel('meters')
