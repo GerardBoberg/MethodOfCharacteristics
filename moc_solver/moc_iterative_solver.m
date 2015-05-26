@@ -51,7 +51,7 @@ not_done  = true;
 % n = number of given initial characteristic lines
 char_line = 0; 
 while( not_done )    % For each characteristic line, we don't know how many
-    char_line = char_line + 1;
+    char_line = char_line + 1
     
     %% SETUP INDEXING
     % Setup the indexing for the starting point of the char line
@@ -144,6 +144,25 @@ catch e
     display( e.message )
 end
 
-% cleanup at the end
+%% Cleanup at the end
+% Generate mach numbers
 M = (u.^2 + v.^2) ./ a.^2;
+
+
+% Lerp mach numbers to fill in the gaps on the top surface. 
+% Makes everything look nicer.
+for kk = 2:size( M, 2 )
+    if( ~(M(end,kk) > 0 ) && (M(end, kk-1) > 0) && (M(end,kk+1) > 0) )
+        display( [ 'interp filling top at kk = ,', num2str( kk ) ] );
+        x( end, kk ) = (x(end,kk-1) + x(end,kk+1))/2;
+        y( end, kk ) = f_wall( x(end,kk) );
+        M( end, kk ) = (M(end,kk-1) + M(end,kk+1))/2;
+        a( end, kk ) = (a(end,kk-1) + a(end,kk+1))/2;
+        
+        alpha        = f_wall_der( x(end,kk) );
+        vel          = M( end,kk ) * a( end, kk );
+        u( end, kk ) = sqrt( vel^2 / (1+alpha) );
+        v( end, kk ) = alpha * u( end, kk );
+    end
+end
 end

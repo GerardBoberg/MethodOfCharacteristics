@@ -6,6 +6,7 @@ alpha   = sqrt( 2 / (rt * yt * (g+1) ) );
 epsilon = yt / 8 * sqrt( (g+1) * 2 / (rt / yt) );
 
 y = linspace( 0, yt, n );
+%y = yt * sqrt( y./yt ); % transforms the vector space to be more top-heavy
 x_bar = -alpha * y.^2 * (g+1) / 8;
 x = x_bar + epsilon;
 
