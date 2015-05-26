@@ -2,9 +2,12 @@ function [ x3, y3, u3, v3, a3 ] = moc_wall_point( data_1,...
                                                 f_wall, f_wall_der, x_star )
 %MOC_WALL_POINT Summary of this function goes here
 %   Detailed explanation goes here
+global a0;
+global gamma;
 %% Setup initial itteration
 tol      = 1e-4; % Tollerance to stop itterating after
 max_runs = 500;  % If it takes this long, something's wrong
+begin_checking_out_of_bounds = 5; % don't start immediatly
 
 % extract data from data_1 and data_2
 x_1 = data_1( 1 );
@@ -17,10 +20,14 @@ a_1 = data_1( 5 );
 x_prev = 100*ones( 4, 1 );
 x_next = x_prev * 0;
 
+% initial conditions
+x3 = x_1;
+y3 = f_wall( x3 );
+
 u_13 = u_1;
 v_13 = v_1;
 
-y_13 = 1;
+y_13 = y_1;
 
 lambda_1_1 = ( u_1 * v_1 + a_1 * sqrt( u_1^2 + v_1^2 - a_1^2 ) ) ...
           / ( u_1^2 - a_1^2 );
@@ -40,26 +47,29 @@ while( not_conv )
     R_13 = 2 * u_13 * v_13 - Q_13 * lambda_13;
 
     S_13 = (a_13^2 * v_13) / y_13;
+    
+    alpha = f_wall_der( x3 );
 
     %% Solve for the next itteration 
     A = [...
-            lambda_13, -1,    0,    0;...
-            lambda_23, -1,    0,    0;...
-                -S_13,  0, Q_13, R_13;...
-                -S_23,  0, Q_23, R_23 ...
+            lambda_13, -1,     0,    0;...
+                alpha, -1,     0,    0;...
+                -S_13,  0,  Q_13, R_13;...
+                    0,  0, alpha,   -1 ...
         ];
 
     B = [...
             lambda_13 * x_1 - y_1;...
-            lambda_23 * x_2 - y_2;...
+            alpha * x3 - y3;...
             -S_13 * x_1 + Q_13 * u_1 + R_13 * v_1;...
-            -S_23 * x_2 + Q_23 * u_2 + R_23 * v_2 ...
+            0 ...
         ];
         
     x_next = A \ B;
     
     %% Setup variables that don't rely on initial condition.
     x3 = x_next( 1 );
+    y3 = f_wall( x3 );
     u3 = x_next( 3 );
     v3 = x_next( 4 );
     a3 = sqrt( a0^2 - (gamma-1)/2 * ( u3^2 + v3^2 ) );
@@ -67,7 +77,7 @@ while( not_conv )
     u_13 = ( u_1 + u3 ) / 2;
     v_13 = ( v_1 + v3 ) / 2;
 
-    y_13 = ( y_1 + u3 ) / 2;
+    y_13 = ( y_1 + y3 ) / 2;
     
     
     lambda_1_3 = (u3*v3 + a3 * sqrt(u3^2 + v3^2 - a3^2) ) / (u3^2-a3^2);

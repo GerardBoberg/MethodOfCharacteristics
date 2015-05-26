@@ -1,7 +1,8 @@
 function [ x3, y3, u3, v3, a3 ] = moc_symmetry_point( data_2 )
 %MOC_SYMETRY_POINT Summary of this function goes here
 %   Detailed explanation goes here
-
+global a0;
+global gamma;
 %% Setup initial itteration
 tol      = 1e-4; % Tollerance to stop itterating after
 max_runs = 500;  % If it takes this long, something's wrong
@@ -17,6 +18,8 @@ a_2 = data_2( 5 );
 x_prev = 100*ones( 4, 1 );
 x_next = x_prev * 0;
 
+
+% initial conditions
 u_23 = u_2;
 v_23 = v_2;
 
@@ -61,14 +64,15 @@ while( not_conv )
     x_next = A \ B;
     
     %% Setup variables that don't rely on initial condition.
+    y3 = 0;
     u3 = x_next( 3 );
-    v3 = 0;
+    v3 = x_next( 4 );
     a3 = sqrt( a0^2 - (gamma-1)/2 * ( u3^2 + v3^2 ) );
 
     u_23 = ( u_2 + u3 ) / 2;
     v_23 = ( v_2 + v3 ) / 2;
 
-    y_23 = ( y_2 + v3 ) / 2;
+    y_23 = ( y_2 + y3 ) / 2;
     
     
     lambda_2_3 = (u3*v3 - a3 * sqrt(u3^2 + v3^2 - a3^2) ) / (u3^2-a3^2);

@@ -1,9 +1,9 @@
 function [ x, y, u, v, a, M ] = moc_iterative_solver( ...
-                                        x_nozzle, y_nozzle, n, thermo )
+                                  x_nozzle, y_nozzle, n, thermo, y_throat )
 %MOC_ITERATIVE_SOLVER Summary of this function goes here
 %   Detailed explanation goes here
 
-N_POLY = 6;
+N_POLY = 4;
 
 %% Setup variables
 % Setup matricies
@@ -72,6 +72,7 @@ while( not_done )    % For each characteristic line, we don't know how many
                 moc_wall_point( data_1, f_wall, f_wall_der, x_star );
         catch e
             if( strcmp( e.identifier, 'ERROR:MOC:MISSED_WALL' ) )
+                break;
                 % Cast D
                 [ x(ii,jj), y(ii,jj), u(ii,jj), v(ii,jj), a(ii,jj) ] = ...
                     moc_wall_backsolve( ...

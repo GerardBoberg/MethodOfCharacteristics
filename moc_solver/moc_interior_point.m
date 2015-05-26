@@ -1,7 +1,8 @@
 function [ x3, y3, u3, v3, a3 ] = moc_interior_point( data_1, data_2 )
 %MOC_INTERIOR_POINT Summary of this function goes here
 %   Detailed explanation goes here
-
+global a0;
+global gamma;
 %% Setup initial itteration
 tol      = 1e-4; % Tollerance to stop itterating after
 max_runs = 500;  % If it takes this long, something's wrong
@@ -23,13 +24,15 @@ a_2 = data_2( 5 );
 x_prev = 100*ones( 4, 1 );
 x_next = x_prev * 0;
 
+
+% initial conditions
 u_13 = u_1;
 v_13 = v_1;
 
 u_23 = u_2;
 v_23 = v_2;
 
-y_13 = 1;
+y_13 = 0.5;
 y_23 = 1;
 
 lambda_1_1 = ( u_1 * v_1 + a_1 * sqrt( u_1^2 + v_1^2 - a_1^2 ) ) ...
@@ -54,8 +57,8 @@ while( not_conv )
     Q_13 = u_13^2 - a_13;
     Q_23 = u_23^2 - a_23;
 
-    R_13 = 2 * u_13 * v_13 - Q_13 * lambda_13;
-    R_23 = 2 * u_23 * v_23 - Q_23 * lambda_23;
+    R_13 = (2 * u_13 * v_13) - (Q_13 * lambda_13);
+    R_23 = (2 * u_23 * v_23) - (Q_23 * lambda_23);
 
     S_13 = (a_13^2 * v_13) / y_13;
     S_23 = (a_23^2 * v_23) / y_23;
@@ -78,6 +81,7 @@ while( not_conv )
     x_next = A \ B;
     
     %% Setup variables that don't rely on initial condition.
+    y3 = x_next( 2 );
     u3 = x_next( 3 );
     v3 = x_next( 4 );
     a3 = sqrt( a0^2 - (gamma-1)/2 * ( u3^2 + v3^2 ) );
@@ -88,8 +92,8 @@ while( not_conv )
     u_23 = ( u_2 + u3 ) / 2;
     v_23 = ( v_2 + v3 ) / 2;
 
-    y_13 = ( y_1 + u3 ) / 2;
-    y_23 = ( y_2 + v3 ) / 2;
+    y_13 = ( y_1 + y3 ) / 2;
+    y_23 = ( y_2 + y3 ) / 2;
     
     
     lambda_1_3 = (u3*v3 + a3 * sqrt(u3^2 + v3^2 - a3^2) ) / (u3^2-a3^2);
