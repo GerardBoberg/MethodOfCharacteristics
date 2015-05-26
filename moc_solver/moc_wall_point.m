@@ -24,6 +24,7 @@ x_next = x_prev * 0;
 x3 = x_1;
 y3 = f_wall( x3 );
 alpha = f_wall_der( x3 );
+%alpha   = v_1/u_1  %f_wall_der( x3 );
 
 u_13 = u_1;
 v_13 = v_1;
@@ -68,6 +69,7 @@ while( not_conv )
     %% Setup variables that don't rely on initial condition.
     x3 = x_next( 1 );
     y3 = f_wall( x3 );
+    alpha = f_wall_der( x3 );
     u3 = x_next( 3 );
     v3 = x_next( 4 );
     a3 = sqrt( a0^2 - (gamma-1)/2 * ( u3^2 + v3^2 ) );
@@ -78,7 +80,7 @@ while( not_conv )
     y_13 = ( y_1 + y3 ) / 2;
     
     
-    lambda_1_3 = lambda( u3, v3, a3, +1, u_13, a_13 );
+    lambda_1_3 = lambda( u3, v3, a3, +1 );
     lambda_13 = ( lambda_1_1 + lambda_1_3 ) / 2;
       
       
@@ -110,7 +112,6 @@ y3 = x_next( 2 );
 u3 = x_next( 3 );
 v3 = x_next( 4 );
 a3 = sqrt( a0^2 - (gamma-1)/2 * ( u3^2 + v3^2 ) );
-
 
 end
 

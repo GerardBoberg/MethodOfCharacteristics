@@ -20,7 +20,7 @@ addpath( 'moc_solver' )
 %% Setup Global variables.
 % CHANGE THINGS HERE for different gasses.
 
-n = 50; % number of characteristic lines
+n = 125; % number of characteristic lines
 
 
 R     = 287;  % J / kg K
@@ -58,7 +58,7 @@ y_prime = [ zeros( 1, L ); y ];
 M_prime = [ zeros( 1, L ); M ];
 
 for ii = 1:size( x_prime, 1 )
-    for jj = 1:size( x_prime, 2 )
+    for jj = 2:size( x_prime, 2 )
         if( x_prime( ii, jj ) == 0 )
             x_prime( ii, jj ) = NaN;
         end
@@ -143,7 +143,7 @@ figure();
 hold on;
 plot(x_nozzle,y_nozzle,'LineWidth',1,'Color','k')
 plot( x(end,:), y(end,:), 'rx' );
-axis( [-0.0055, 0.0520, 0.1090, 0.1543] );
+axis( [0, 0.04, 0.125, 0.145] );
 title( 'Characteristic line intersection with nozzle wall' );
 xlabel( 'nozzle x location, meters' );
 ylabel( 'nozzle y location, meters' );
@@ -155,3 +155,10 @@ sym_loc( :, 3 ) = M( 1, 1:2:ceil(2.2*n) );
 display( '---- symmetry intersections -----' )
 display( '  x            y         Mach' );
 display( num2str( sym_loc, 3 ) );
+
+% 7 -- quiver for debug purposes
+figure();
+quiver( x, y, u, v );
+title( 'Quiver plot of velocities' );
+xlabel( 'Nozzle x location, meters' );
+ylabel( 'Nozzle y location, meters' );

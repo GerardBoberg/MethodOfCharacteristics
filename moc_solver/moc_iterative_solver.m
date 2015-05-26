@@ -18,13 +18,19 @@ a = zeros( dimensions );
 
 % Setup initial data line
 global gamma;
+global a0;
 gamma = thermo.gamma;
 R     = thermo.R;
 T0    = thermo.T0;
+a0 = sqrt( gamma * R * T0 );
 [ x(:,1), y(:,1), u(:,1), v(:,1), a(:,1) ] = initial_data_line...
                                      ( y_throat, y_throat/2, gamma, R, T0, n );
-global a0;
-a0 = sqrt( gamma * R * T0 );
+
+figure();
+plot( x(:,1), ( sqrt( u(:,1).^2 + v(:,1).^2)./a(:,1) ) );
+title( 'x vs Mach, initial data' );
+
+                                 
 % wall gemoetry and function handles
 wall_poly     = polyfit( x_nozzle, y_nozzle, N_POLY );
 wall_poly_der = polyder( wall_poly );
@@ -51,7 +57,7 @@ not_done  = true;
 % n = number of given initial characteristic lines
 char_line = 0; 
 while( not_done )    % For each characteristic line, we don't know how many
-    char_line = char_line + 1
+    char_line = char_line + 1;
     
     %% SETUP INDEXING
     % Setup the indexing for the starting point of the char line
@@ -74,12 +80,14 @@ while( not_done )    % For each characteristic line, we don't know how many
         
         try
             % Cast C
+            fprintf( '\nCasting C\n' );
             [ x(ii,jj), y(ii,jj), u(ii,jj), v(ii,jj), a(ii,jj) ] = ...
                 moc_wall_point( data_1, f_wall, f_wall_der, x_star );
         catch e
             if( strcmp( e.identifier, 'ERROR:MOC:MISSED_WALL' ) )
                 display( 'Missed wall, erroring out' );
                 % Cast D
+                fprintf( '\nCasting D\n' );
                 [ x(ii,jj), y(ii,jj), u(ii,jj), v(ii,jj), a(ii,jj) ] = ...
                     moc_wall_backsolve( ...
                         data_1, data_2, f_wall, f_wall_der, x_star, y_star );
@@ -108,7 +116,6 @@ while( not_done )    % For each characteristic line, we don't know how many
     final_value = length( i_values );
     
     for index = 2:final_value % for every point on the line until symmetry
-        pause( 1/ fps );
         % setup indexing
         ic = i_values( index ); % ic, jc are the current index
         jc = j_values( index );
@@ -153,7 +160,7 @@ M = (u.^2 + v.^2) ./ a.^2;
 % Makes everything look nicer.
 for kk = 2:size( M, 2 )
     if( ~(M(end,kk) > 0 ) && (M(end, kk-1) > 0) && (M(end,kk+1) > 0) )
-        display( [ 'interp filling top at kk = ,', num2str( kk ) ] );
+        display( [ 'interp filling top at kk = ', num2str( kk ) ] );
         x( end, kk ) = (x(end,kk-1) + x(end,kk+1))/2;
         y( end, kk ) = f_wall( x(end,kk) );
         M( end, kk ) = (M(end,kk-1) + M(end,kk+1))/2;

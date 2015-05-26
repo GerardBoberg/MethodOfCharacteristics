@@ -102,11 +102,8 @@ while( not_conv )
     y_13 = ( y_1 + y3 ) / 2;
     y_23 = ( y_2 + y3 ) / 2;
     
-    
-    a_13 = sqrt( a0^2 - (gamma-1)/2 * (u_13^2 + v_13^2) );
-    a_23 = sqrt( a0^2 - (gamma-1)/2 * (u_23^2 + v_23^2) );
-    lambda_1_3 = lambda( u3, v3, a3, +1, u_13, a_13 );
-    lambda_2_3 = lambda( u3, v3, a3, -1, u_23, a_23 );
+    lambda_1_3 = lambda( u3, v3, a3, +1 );
+    lambda_2_3 = lambda( u3, v3, a3, -1 );
 
     lambda_13 = ( lambda_1_1 + lambda_1_3 ) / 2;
     lambda_23 = ( lambda_2_2 + lambda_2_3 ) / 2;
