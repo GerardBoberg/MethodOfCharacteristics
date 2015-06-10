@@ -5,7 +5,7 @@ function [ x, y, slope, Mach ] = initial_data_line( yt, rt, g, n )
 alpha   = sqrt( 2 / (rt * yt * (g+1) ) );
 epsilon = yt / 8 * sqrt( (g+1) * 2 / (rt / yt) );
 
-y = linspace( 0, yt, n );
+y = linspace( yt/1000, yt, n );
 y = yt * ( y./yt ).^(1/2); % transforms the vector space to be more top-heavy
 x_bar = -alpha * y.^2 * (g+1) / 8;
 x = x_bar + epsilon;
