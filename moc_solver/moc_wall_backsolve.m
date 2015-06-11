@@ -36,7 +36,10 @@ f = @(ag)( x3 - find_expected_x( ag,...
                                      x1, y1, slope1, Mach1,...
                                      x2, y2, slope2, Mach2,...
                                      f_wall, x3, slope3 ) );
-ag = fsolve( f, 0.5 );
+                                 
+
+options = optimset('Display', 'off');
+ag = fsolve( f, 0.5, options );
 
 %% Determine the mach number based off our located point A
 % assume lin variation
@@ -78,5 +81,8 @@ nu_a3  = ( slope3 - slopea ) + nua;
 char_a3 = tand( ( (slopea + mua) + (slope3 + mu3) ) /2 );
 
 F  = @(x)( (ya + char_a3*(x-xa)) - f_wall(x) );
-xr = fsolve( F, x3 );
+
+
+options = optimset('Display', 'off');
+xr = fsolve( F, x3, options );
 end

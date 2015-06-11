@@ -23,8 +23,11 @@ Mach1  = data_1(4);
 f = @(x)( x - find_expected_x( x, x1, y1, slope1, nu1, mu1,...
                                                   f_wall, f_wall_der ) );
 
-dy = f_wall( x1 ) - y1; % dist point 1 <--> wall same order of magnitude as x
-x3 = fsolve( f, x1+dy );
+dy = f_wall( x1 ) - y1; % dist point 1 <--> wall same order of magnitude as 
+
+
+options = optimset('Display', 'off');
+x3 = fsolve( f, x1+dy, options );
 
 if( x3 >= x_star )
     error( 'ERROR:MOC:MISSED_WALL',...
@@ -50,6 +53,9 @@ nu_13  = ( slope3 - slope1 ) + nu1;
 char_13 = tand( ( (slope1 + mu1) + (slope3 + mu3) ) /2 );
 
 F  = @(x)( (y1 + char_13*(x-x1)) - f_wall(x) );
-xr = fsolve( F, xg );
+
+
+options = optimset('Display', 'off');
+xr = fsolve( F, xg, options );
 end
 

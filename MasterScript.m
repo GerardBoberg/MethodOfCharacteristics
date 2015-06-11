@@ -20,7 +20,8 @@ addpath( 'moc_solver' )
 %% Setup Global variables.
 % CHANGE THINGS HERE for different gasses.
 
-n = 80; % number of characteristic lines
+n = 100; % number of characteristic lines
+%axis( [0, 3, 0, 0.25] )
 
 
 R     = 287;  % J / kg K
