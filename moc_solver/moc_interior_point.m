@@ -30,7 +30,7 @@ Mach2  = data_2(4);
 
 %% Slove for angles of point 3
 % First, solve for the theta value of point 3, using prandtl-meyer angles
-slope3 = ( (slope1 + nu1) + (slope2 - nu2) )/ 2;
+slope3 = ( (slope1 - nu1) + (slope2 + nu2) )/ 2;
 
 % Now, do prandtl-meyer expansion for point 3
 nu_13 = ( slope1 - slope3 ) + nu1;
