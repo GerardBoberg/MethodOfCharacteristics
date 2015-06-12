@@ -10,9 +10,10 @@ v = M.*sind(theta);
 
 % 1 -- Mach number variation
 figure
+subplot(2,1,1)
 C = min( M, 5 );
 surfc(x,y,M, C, 'EdgeAlpha', 0.1)
-axis( [0, 0.5, 0, 0.14] );
+% axis( [0, 0.5, 0, 0.14] );
 caxis( [1,6] );
 %colormap( hsv );
 %contour( x, y, M )
@@ -23,12 +24,16 @@ plot(x_nozzle,y_nozzle,'LineWidth',4,'Color','k')
 title( 'Mach number variation in the nozzle' )
 xlabel('location in nozzle, meters')
 ylabel('location in nozzle, meters')
+axis equal
+axis ([0 3 0 0.5])
+hold off
+
 
 % 2 -- Pressure variation
-figure
+subplot(2,1,2)
 surfc( x,y,P_nozzlethroat, 'EdgeAlpha', 0.1)
 %contour( x, y, M )
-axis( [0, 0.5, 0, 0.14] );
+% axis( [0, 0.5, 0, 0.14] );
 view(2)
 colorbar; 
 %colormap( hsv );
@@ -38,6 +43,9 @@ plot(x_nozzle,y_nozzle,'LineWidth',4,'Color','k')
 title( 'Pressure variation in the nozzle' )
 xlabel('nozzle location, meters')
 ylabel('nozzle location, meters')
+axis equal
+axis ([0 3 0 0.3])
+hold off
 
 % 3 -- P_static along the wall vs. x-location
 figure();
@@ -50,11 +58,14 @@ ylabel( 'Pressure, Pa' );
 figure();
 hold on;
 plot( x, y, 'c.' );
-axis( [0, 0.5, 0, 0.14] );
+% axis( [0, 0.5, 0, 0.14] );
 plot(x_nozzle,y_nozzle,'LineWidth',2,'Color','k')
 title( 'Characteristic Line intersections' );
 xlabel( 'nozzle x location, meters' );
 ylabel( 'nozzle y location, meters' );
+axis equal
+axis ([0 3 0 0.5])
+hold off
 
 % 5 -- Final Nozzle geometry w/ points where char lines intersected wall
 figure();
