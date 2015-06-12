@@ -20,7 +20,7 @@ addpath( 'moc_solver' )
 %% Setup Global variables.
 % CHANGE THINGS HERE for different gasses.
 
-n = 100; % number of characteristic lines
+n = 20; % number of characteristic lines
 %axis( [0, 3, 0, 0.25] )
 
 
@@ -47,10 +47,9 @@ thermo.T0    = T0;
 [ x, y, slope, M ] = moc_iterative_solver( x_nozzle, y_nozzle, n,...
                                                thermo, y_throat );
 
-x = real( x );
-y = real( y );
-M = real( M );
-
+%[ x, y, slope, M ] = moc_clean_top_row( x, y, slope, M );
+%[ x, y, slope, M ] = moc_clean_top_row( x, y, slope, M );
+%[ x, y, slope, M ] = moc_clean_top_row( x, y, slope, M );
 
 
 % solve out the thermodynamic properties based on Mach

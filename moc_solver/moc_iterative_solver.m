@@ -2,7 +2,7 @@ function [ x, y, slope, M ] = moc_iterative_solver( ...
                                   x_nozzle, y_nozzle, n, thermo, y_throat )
 %MOC_ITERATIVE_SOLVER Summary of this function goes here
 %   Detailed explanation goes here
-
+fps = 1000;
 N_POLY = 4; % degree of polynomial for fitting to nozzle x & y
 
 %% Setup variables
@@ -19,8 +19,8 @@ global gamma;
 gamma = thermo.gamma;
 [ x(:,1), y(:,1), slope(:,1), Mach(:,1) ] = initial_data_line...
                                      ( y_throat, y_throat/2, gamma, n );
-figure();
-plot( x(:,1), y(:,1), 'bx' );
+%figure();
+%plot( x(:,1), y(:,1), 'bx' );
                                  
 % create wall gemoetry function handles
 wall_poly     = polyfit( x_nozzle, y_nozzle, N_POLY );
@@ -40,15 +40,26 @@ y_star = y_nozzle(end);
 % i1 [ 1  2  2  3  3 ]
 %     j1 j2 j3 j4 j5
 
-figure();
-hold on
-plot(x_nozzle,y_nozzle,'LineWidth',4,'Color','k')
+%figure();
+%hold on
+%plot(x_nozzle,y_nozzle,'LineWidth',4,'Color','k')
 
+% poly fit, slightly over estimates for large n
+est_num_points = floor( 1.6 * n^2 - 2.75 * n + 22.8 ); 
+num_points_calced = 0;
+next_progress = 2;
 
+tic
+disp( 'Method of Characteristics, throat area progress:' )
+disp( '0% [----------20%-------40%-------60%-------80%-------] 100%' )
+fprintf( '   [' );
+
+% Start the loop
 not_done  = true;
 % n = number of given initial characteristic lines
 char_line = 0; 
 while( not_done )    % For each characteristic line, we don't know how many
+    pause( 1/fps );
     char_line = char_line + 1;
     
     % ----- This is a two-part loop -----
@@ -79,6 +90,7 @@ while( not_done )    % For each characteristic line, we don't know how many
             [ x(ii,jj), y(ii,jj), slope(ii,jj), Mach(ii,jj) ] = ...
                 moc_wall_point( data_1, f_wall, f_wall_der, x_star );
             %plot( [], [], 'r.'
+        
         catch e % if C goes past x_star, it throws an exception
             if( strcmp( e.identifier, 'ERROR:MOC:MISSED_WALL' ) )
                 % Cast D -- backsolve wall boundary
@@ -129,7 +141,7 @@ while( not_done )    % For each characteristic line, we don't know how many
             % Cast B -- symmetry line
             [ x(ic,jc), y(ic,jc), slope(ic,jc), Mach(ic,jc) ] = ...
                 moc_symmetry_point( data_1 );
-            plot( [x(ii,jj), x(ic,jc)], [y(ii,jj), y(ic,jc)], 'b' );
+            %plot( [x(ii,jj), x(ic,jc)], [y(ii,jj), y(ic,jc)], 'b' );
             
         else % every other interior point
             data_2 = [ x(i2, j2), y(i2,j2), slope(i2,j2), Mach(i2,j2) ];
@@ -137,12 +149,26 @@ while( not_done )    % For each characteristic line, we don't know how many
             % Cast A -- interior point
             [ x(ic,jc), y(ic,jc), slope(ic,jc), Mach(ic,jc) ] = ...
                 moc_interior_point( data_1, data_2 );
-            plot( x(ic,jc), y(ic,jc), 'r*' );
+            %plot( x(ic,jc), y(ic,jc), 'r*' );
         end
         
     end
     
+    % Progress bar
+    num_points_calced = num_points_calced + final_value;
+    est_progress = floor( 100 * num_points_calced / est_num_points );
+    
+    while( est_progress >= next_progress )
+        next_progress = next_progress + 2;
+        fprintf( '-' );
+    end
 end
+fprintf( ']' );
+disp( ' ' );
+disp( [ num2str( num_points_calced ), '  Points calculated in  ',...
+        num2str( toc ), '  seconds' ] );
+disp( ' ' );
+disp( ' ' );
 
 %% Cleanup at the end
 
@@ -151,7 +177,7 @@ end
 for kk = 2:size( Mach, 2 )
     % if we're inbetween two points that have defined mach values
     if( ~(Mach(end,kk) > 0 ) && (Mach(end, kk-1) > 0) && (Mach(end,kk+1) > 0) )
-        display( [ 'interp filling top at kk = ', num2str( kk ) ] );
+        %display( [ 'interp filling top at kk = ', num2str( kk ) ] );
         
         % assume linear variation, and fill in the values
         x( end, kk ) = (x(end,kk-1) + x(end,kk+1))/2;

@@ -49,7 +49,7 @@ hold off
 
 % 3 -- P_static along the wall vs. x-location
 figure();
-plot( x(end,1:length(P_static_wall)), P_static_wall, 'r-x');
+plot( x(end-1,1:length(P_static_wall)), P_static_wall, 'r-x');
 title( 'Pressure variation along the wall' );
 xlabel( 'wall x location, meters' );
 ylabel( 'Pressure, Pa' );
@@ -71,18 +71,19 @@ hold off
 figure();
 hold on;
 plot(x_nozzle,y_nozzle,'LineWidth',1,'Color','k')
-plot( x(end,:), y(end,:), 'rx' );
+plot( x(end-1,:), y(end-1,:), 'rx' );
 axis( [0, 0.04, 0.125, 0.145] );
 title( 'Characteristic line intersection with nozzle wall' );
 xlabel( 'nozzle x location, meters' );
 ylabel( 'nozzle y location, meters' );
 
 % 6 -- output of the values of the symmetry intersections
-sym_loc( :, 1 ) = x( 1, 1:2:ceil(2.2*n) );
-sym_loc( :, 2 ) = y( 1, 1:2:ceil(2.2*n) );
-sym_loc( :, 3 ) = M( 1, 1:2:ceil(2.2*n) );
+index = find( ( y(2,:) == 0 ), 1, 'last' );
+sym_loc( :, 1 ) = x( 2, index );
+sym_loc( :, 2 ) = y( 2, index );
+sym_loc( :, 3 ) = M( 2, index );
 display( '---- symmetry intersections -----' )
-display( '  x            y         Mach' );
+display( '  x          y       Mach' );
 display( num2str( sym_loc, 3 ) );
 
 % 7 -- quiver for debug purposes
